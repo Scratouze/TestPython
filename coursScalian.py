@@ -1,7 +1,10 @@
 # -----------------------------------------------------------------#
 # Exercices
-
+import itertools
+import json
+import random
 import sys
+
 
 def multiply(a, b):
     return a * b
@@ -143,7 +146,7 @@ def my_list():
 # -----------------------------------------------------------------#
 # Mot de passe
 
-def password_check(pwd):
+def password_check(pwd) -> bool:
     SpecialChar = ['$', '@', '#', '%', '+', '-', '*', '!', '?']
     result = True
     if not any(char.isdigit() for char in pwd):
@@ -177,6 +180,100 @@ def identifiers():
 
     print(f"Vos identifiants de connexion sont  : \n{username} - {pwd}")
     print(separator)
+
+
+# -----------------------------------------------------------------#
+# Class
+
+
+class Account(object):
+    accounts = []
+    _idCounter = itertools.count()
+
+    def __init__(self, name: str, firstname: str, balance: int):
+        self.id = next(Account._idCounter)
+        self.name = name
+        self.firstName = firstname
+        self.balance = balance
+        Account.accounts.append(self)
+
+    def payement(self, amount: int):
+        self.balance = self.balance + amount
+        print(f"Vous avez effectué un dépôt de {amount} € sur le compte de {self.name} {self.firstName}")
+
+    def pullOut(self, amount: int):
+        if self.balance < 0:
+            print(
+                f"Votre compte est débiteur de {self.balance} €, vous ne pouvez pas faire de virement\n")
+        elif (self.balance - amount) < 0:
+            print(
+                f"Votre compte n'a pas les fond suffisants, vous allez être à découvert de {self.balance - amount} €\n")
+            self.balance = self.balance * 95 / 100
+            self.balance = self.balance - amount
+        else:
+            self.balance = self.balance - amount
+
+    def transfert(self, count, amount: int):
+        self.pullOut(amount)
+        count.payement(amount)
+
+    @staticmethod
+    def createAccount():
+        name: str = input("Veuillez rentrez le nom : ")
+        firstname: str = input("Veuillez rentrez le prenom : ")
+        balance = input(f"Veuillez rentrez le solde du compte de {name} {firstname} : ")
+        return Account(name, firstname, int(balance))
+
+    @staticmethod
+    def viewAllAccounts() -> json:
+        jsonResult = []
+        for account in Account.accounts:
+            accountDict = {'id': account.id, 'name': account.name, 'firstname': account.firstName,
+                           'balance': account.balance}
+            jsonAccount = json.dumps(accountDict)
+            jsonResult.append(jsonAccount)
+        print(jsonResult)
+
+    def __str__(self) -> str:
+        return f'id: {self.id} \nname: {self.name} \nfirstname: {self.firstName} \nbalance: {self.balance} \n'
+
+
+class CheckingAccount(Account):
+
+    def __init__(self, name, firstname, balance):
+        super().__init__(name, firstname, balance)
+
+    def payement(self, amount):
+        super().payement(amount)
+
+    def pullOut(self, amount):
+        super().pullOut(amount)
+
+    def transfert(self, count, amount):
+        super().transfert(count, amount)
+
+    @staticmethod
+    def createAccount():
+        return Account.createAccount()
+
+    @staticmethod
+    def viewAllAccounts():
+        Account.viewAllAccounts()
+
+    def __str__(self) -> str:
+        return super().__str__()
+
+
+# MonCompte = CheckingAccount("Thomas", "Berta", 1000)
+# MonCompte2 = CheckingAccount("Alex", "Tom", 1500)
+# CheckingAccount.viewAllAccounts()
+# MonCompte.payement(200)
+# MonCompte2.pullOut(100)
+# MonCompte.transfert(MonCompte2, 2000)
+CheckingAccount.createAccount()
+CheckingAccount.createAccount()
+CheckingAccount.createAccount()
+CheckingAccount.viewAllAccounts()
 
 # -----------------------------------------------------------------#
 
