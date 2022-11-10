@@ -14,9 +14,9 @@
 ***
 #### 3. Ecrire une fonction qui prend en entrée une température t et qui renvoie l'état de l'eau à cette température et afficher le résultat. 
 ```
-C'est à dire "SOLIDE", "LIQUIDE" ou "GAZEUX". On prendra comme conditions les suivantes : 
+On prendra comme conditions : 
 - Si la température est strictement négative alors l'eau est à l'état solide.
-- Si la température est entre 0 et 100 (compris) l'eau est à l'état liquide.
+- Si la température est entre 0 et 100 inclus, l'eau est à l'état liquide.
 - Si la température est strictement supérieure à 100.
 Entrée : Une température t.
 Sortie : L'état de l'eau à cette température parmi les trois possibilités : 
@@ -73,6 +73,30 @@ Resultat attendu :
 ```
 Une fois que tout est validés, afficher à l'utilisateur son identifiant et son mot de passe.
 Tant que tout les critères ne sont pas remplis, l'utilisateur doit réeffectuer sa saisie.
+***
+#### 12 . Créer sur une class BankAccount, instancier 3 comptes et tester les différentes méthodes:
+```
+- Attributs :
+    - idAccount 
+    - Name
+    - FirstName
+    - Balance
+- Méthodes :
+    - createAccount
+    - payment (ajouter des fonds)
+    - pullOut (retirer des fonds)
+    - transfert (virement vers un autre compte)
+    - displayAccount : afficher un compte sous la forme :
+        id: 
+        name:  
+        firstname: 
+        balance:   
+    - viewAllAccounts (afficher tout les comptes) la méthode affichera un tableau de JSON
+     
+```
+Créer 3 comptes et tester les différentes méthodes.
+
+
 ***
 ***
 ## Exemples de correction
