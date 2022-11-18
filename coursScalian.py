@@ -2,7 +2,6 @@
 # Exercices
 import itertools
 import json
-import random
 import sys
 
 
@@ -168,7 +167,7 @@ def identifiers():
     while len(username) <= 2 or len(username) >= 19 or username.isdigit():
         username = input("Entrez un nom d'utilisateur entre 3 et 20 caractères contenant au moins 1 lettre : \n")
     else:
-        print(f"Your user name is : {username}")
+        print(f"Your user lastName is : {username}")
         print(separator)
         pwd = input("Entrez un mot de passe (minimum 8 caractères) : \n")
     while len(pwd) == 0:
@@ -189,91 +188,205 @@ def identifiers():
 class Account(object):
     accounts = []
     _idCounter = itertools.count()
+    separator = "-" * 25
 
-    def __init__(self, name: str, firstname: str, balance: int):
+    def __init__(self, lastName: str, firstName: str, balance: int):
         self.id = next(Account._idCounter)
-        self.name = name
-        self.firstName = firstname
+        self.lastName = lastName
+        self.firstName = firstName
         self.balance = balance
         Account.accounts.append(self)
 
-    def payement(self, amount: int):
-        self.balance = self.balance + amount
-        print(f"Vous avez effectué un dépôt de {amount} € sur le compte de {self.name} {self.firstName}")
-
-    def pullOut(self, amount: int):
-        if self.balance < 0:
-            print(
-                f"Votre compte est débiteur de {self.balance} €, vous ne pouvez pas faire de virement\n")
-        elif (self.balance - amount) < 0:
-            print(
-                f"Votre compte n'a pas les fond suffisants, vous allez être à découvert de {self.balance - amount} €\n")
-            self.balance = self.balance * 95 / 100
-            self.balance = self.balance - amount
-        else:
-            self.balance = self.balance - amount
-
-    def transfert(self, count, amount: int):
-        self.pullOut(amount)
-        count.payement(amount)
-
     @staticmethod
     def createAccount():
-        name: str = input("Veuillez rentrez le nom : ")
-        firstname: str = input("Veuillez rentrez le prenom : ")
-        balance = input(f"Veuillez rentrez le solde du compte de {name} {firstname} : ")
-        return Account(name, firstname, int(balance))
+        pass
 
     @staticmethod
-    def viewAllAccounts() -> json:
-        jsonResult = []
-        for account in Account.accounts:
-            accountDict = {'id': account.id, 'name': account.name, 'firstname': account.firstName,
-                           'balance': account.balance}
-            jsonAccount = json.dumps(accountDict)
-            jsonResult.append(jsonAccount)
-        print(jsonResult)
+    def deleteAccount():
+        pass
+
+    @staticmethod
+    def payement(pullout: bool, targetAccountId=0, amount=0):
+        pass
+
+    @staticmethod
+    def transfert():
+        pass
+
+    @staticmethod
+    def viewAllJsonAccounts() -> json:
+        pass
+
+    @staticmethod
+    def viewAllAccounts():
+        pass
+
+    @staticmethod
+    def checkAccountId(Id: int):
+        pass
 
     def __str__(self) -> str:
-        return f'id: {self.id} \nname: {self.name} \nfirstname: {self.firstName} \nbalance: {self.balance} \n'
+        return f'id: {self.id} \nlastName: {self.lastName} \nfirstName: {self.firstName} \nbalance: {self.balance} \n'
 
 
 class CheckingAccount(Account):
 
-    def __init__(self, name, firstname, balance):
-        super().__init__(name, firstname, balance)
-
-    def payement(self, amount):
-        super().payement(amount)
-
-    def pullOut(self, amount):
-        super().pullOut(amount)
-
-    def transfert(self, count, amount):
-        super().transfert(count, amount)
+    def __init__(self, lastName: str, firstName: str, balance: int):
+        super().__init__(lastName, firstName, balance)
 
     @staticmethod
     def createAccount():
-        return Account.createAccount()
+        lastName: str = input("Veuillez rentrez le nom : ")
+        firstName: str = input("Veuillez rentrez le prénom : ")
+        balance = "0"
+        balance = input(f"Veuillez rentrez le solde du compte de {lastName} {firstName} : ")
+        while not balance.isdigit():
+            print(f"Veuillez ne rentrer que des chiffres pour le solde du compte !\n{CheckingAccount.separator}")
+            balance = input(f"Veuillez rentrez le solde du compte de {lastName} {firstName} : ")
+        print(f"{CheckingAccount.separator}\nLe compte courant de {lastName} {firstName} a été créé avec un solde de {balance} €")
+        return CheckingAccount(lastName, firstName, int(balance))
+
+    @staticmethod
+    def deleteAccount():
+        targetAccountId: int = int(input("Quel compte souhaitez vous supprimer (id) ? "))
+        targetAccount = CheckingAccount.checkAccountId(targetAccountId)
+        print(f"Le compte de {targetAccount.lastName} {targetAccount.firstName} a été supprimé")
+        CheckingAccount.accounts.remove(targetAccount)
+
+    @staticmethod
+    def payement(pullout: bool, targetAccountId=0, amount=0):
+        action1 = "vers" if not pullout else "depuis"
+        action2 = "versement" if not pullout else "prélèvement"
+        if not targetAccountId and not amount:
+            targetAccountId: int = int(input(f"{action1} quel compte souhaitez vous effectuer un {action2} (id): "))
+            amount = input(f"De quel montant est votre {action2} : ")
+        amount = -int(amount) if pullout else int(amount)
+        if not CheckingAccount.checkAccountId(targetAccountId):
+            print(f"{CheckingAccount.separator}Le compte {action1} lequel vous essayer d'effectuer ce {action2} n'existe pas")
+            pass
+        else:
+            target = CheckingAccount.checkAccountId(int(targetAccountId))
+            action = "dépôt" if (amount > 0) else "retrait"
+            if target.balance > 0:
+                target.balance += amount
+                if target.balance < 0:
+                    print(
+                        f"\nLe compte de {target.lastName} {target.firstName} n'a pas les fond suffisants, le compte "
+                        f"va être à découvert de {target.balance} €")
+                print(
+                        f"{CheckingAccount.separator}\nVous avez effectué un {action} de {amount} € sur le compte de"
+                        f"{target.lastName} {target.firstName}")
+            else:
+                print(
+                    f"{CheckingAccount.separator}\nLe compte de {target.lastName} {target.firstName} est débiteur de"
+                    f"{target.balance} €, vous ne pouvez pas faire de {action}")
+
+    @staticmethod
+    def transfert():
+        originAccountId: int = int(input("Depuis quel compte souhaitez vous effectuer un virement (id): "))
+        originAccount: CheckingAccount = CheckingAccount.checkAccountId(originAccountId)
+        if not originAccount:
+            print(f"Le compte depuis lequel vous essayer d'effectuer ce virement n'existe pas")
+            pass
+        else:
+            targetAccountId: int = int(input("Vers quel compte souhaitez vous effectuer un virement (id): "))
+            targetAccount: CheckingAccount = CheckingAccount.checkAccountId(targetAccountId)
+            if not targetAccount:
+                print(f"Le compte vers lequel vous essayer d'effectuer ce virement n'existe pas")
+                pass
+            else:
+                amount = int(input("De quel montant est votre virement : "))
+                originAccount.payement(True, originAccountId, amount)
+                targetAccount.payement(False, targetAccountId, amount)
+
+    @staticmethod
+    def viewAllJsonAccounts() -> json:
+        jsonResult = []
+        for account in CheckingAccount.accounts:
+            accountDict = {'id': account.id, 'lastName': account.lastName, 'firstName': account.firstName,
+                           'balance': account.balance}
+            jsonAccount = json.dumps(accountDict)
+            jsonResult.append(jsonAccount)
+        print(CheckingAccount.separator)
+        print(jsonResult)
+        print(CheckingAccount.separator)
 
     @staticmethod
     def viewAllAccounts():
-        Account.viewAllAccounts()
+        result = ""
+        if not CheckingAccount.accounts:
+            print("Il n'y a pas de compte créé")
+        else:
+            for account in CheckingAccount.accounts:
+                result += f"id: {account.id}\nlastName: {account.lastName}\nfirstName: {account.firstName}\nbalance:"
+                f"{account.balance} €\n{CheckingAccount.separator} \n"
+            print(result)
+
+    @staticmethod
+    def checkAccountId(Id: int):
+        accounts = CheckingAccount.accounts
+        for account in accounts:
+            if account.id == Id:
+                return account
 
     def __str__(self) -> str:
         return super().__str__()
 
 
+def myBank():
+    print(
+        f"{CheckingAccount.separator}\n{CheckingAccount.separator}\nBienvenue sur Ma Banque\n{CheckingAccount.separator}"
+        f"\n{CheckingAccount.separator}")
+    menu = "Choisissez parmi les 5 options suivantes \n" \
+           "1: Afficher tout les comptes \n" \
+           "2: Créer un compte  \n" \
+           "3: Supprimer un compte \n" \
+           "4: Effectuer un versement sur un compte \n" \
+           "5: Effectuer un prélèvement depuis un compte \n" \
+           "6: Effectuer un virement entre 2 comptes \n" \
+           "7: Quitter \n" \
+           "Votre choix -> "
+
+    menu_choice = ["1", "2", "3", "4", "5", "6", "7"]
+    while True:
+        user_choice = ""
+        while user_choice not in menu_choice:
+            user_choice = input(menu)
+            if user_choice not in menu_choice:
+                print("\n Veuillez choisir une option valide")
+                print(CheckingAccount.separator)
+            else:
+                print(CheckingAccount.separator)
+                match user_choice:
+                    case "1":
+                        CheckingAccount.viewAllAccounts()
+                    case "2":
+                        CheckingAccount.createAccount()
+                    case "3":
+                        CheckingAccount.deleteAccount()
+                    case "4":
+                        CheckingAccount.payement(False)
+                    case "5":
+                        CheckingAccount.payement(True)
+                    case "6":
+                        CheckingAccount.transfert()
+                    case "7":
+                        print(f"A bientôt !\n{CheckingAccount.separator}")
+                        sys.exit()
+        print(CheckingAccount.separator)
+
+
+myBank()
+
+
 # MonCompte = CheckingAccount("Thomas", "Berta", 1000)
 # MonCompte2 = CheckingAccount("Alex", "Tom", 1500)
+# CheckingAccount.viewAllJsonAccounts()
 # CheckingAccount.viewAllAccounts()
 # MonCompte.payement(200)
 # MonCompte2.pullOut(100)
 # MonCompte.transfert(MonCompte2, 2000)
-CheckingAccount.createAccount()
-CheckingAccount.createAccount()
-CheckingAccount.createAccount()
-CheckingAccount.viewAllAccounts()
+
 
 # -----------------------------------------------------------------#
 
@@ -291,3 +404,4 @@ CheckingAccount.viewAllAccounts()
 # print(add_dict({"un": 2, "deux": 3, "trois": 1}, {"deux": 1, "quatre": 3, "cinq": 2, "six":1}))
 # my_list()
 # identifiers()
+myBank()
