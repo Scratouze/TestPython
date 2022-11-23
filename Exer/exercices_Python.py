@@ -184,6 +184,7 @@ def identifiers():
 # -----------------------------------------------------------------#
 # Class
 
+# TODO : assert
 
 class Account(object):
     accounts = []
@@ -191,6 +192,7 @@ class Account(object):
     separator = "-" * 25
 
     def __init__(self, lastName: str, firstName: str, balance: int):
+        assert balance > 0;
         self.id = next(Account._idCounter)
         self.lastName = lastName
         self.firstName = firstName
@@ -232,12 +234,19 @@ class Account(object):
 class CheckingAccount(Account):
 
     def __init__(self, lastName: str, firstName: str, balance: int):
+        assert balance > 0, "Le solde d'un nouveau compte doit être positif"
         super().__init__(lastName, firstName, balance)
 
     @staticmethod
     def createAccount():
         lastName: str = input("Veuillez rentrez le nom : ")
+        while not lastName.isalpha():
+            print(f"Veuillez ne rentrer que des lettres pour le Nom du compte !\n{CheckingAccount.separator}")
+            lastName: str = input("Veuillez rentrez le nom : ")
         firstName: str = input("Veuillez rentrez le prénom : ")
+        while not firstName.isalpha():
+            print(f"Veuillez ne rentrer que des lettres pour le Prenom du compte !\n{CheckingAccount.separator}")
+            firstName: str = input("Veuillez rentrez le nom : ")
         balance = "0"
         balance = input(f"Veuillez rentrez le solde du compte de {lastName} {firstName} : ")
         while not balance.isdigit():
@@ -376,8 +385,6 @@ def myBank():
         print(CheckingAccount.separator)
 
 
-myBank()
-
 
 # MonCompte = CheckingAccount("Thomas", "Berta", 1000)
 # MonCompte2 = CheckingAccount("Alex", "Tom", 1500)
@@ -404,4 +411,4 @@ myBank()
 # print(add_dict({"un": 2, "deux": 3, "trois": 1}, {"deux": 1, "quatre": 3, "cinq": 2, "six":1}))
 # my_list()
 # identifiers()
-myBank()
+# myBank()
