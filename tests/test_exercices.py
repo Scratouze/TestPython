@@ -2,7 +2,7 @@ import string
 import unittest
 import random
 
-from exer import CheckingAccount, Account
+from myBank import CheckingAccount, Account
 
 if __name__ == '__main__':
     unittest.main()
